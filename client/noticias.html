@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Noticias de Fútbol Europeo - MatchPulse</title>
+  <style>
+    /* Fondo oscuro y tipografía */
+    body {
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      color: #e0e6ed;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 20px auto;
+      max-width: 900px;
+      min-height: 100vh;
+    }
+
+    h1 {
+      text-align: center;
+      color: #1e90ff;
+      font-weight: 700;
+      font-size: 2.5rem;
+      margin-bottom: 30px;
+      text-shadow: 0 0 10px #1e90ffaa;
+    }
+
+    #btn-actualizar {
+      display: block;
+      margin: 0 auto 30px auto;
+      padding: 12px 28px;
+      font-size: 1.1rem;
+      background: linear-gradient(90deg, #1e90ff, #3b82f6);
+      border: none;
+      border-radius: 8px;
+      color: white;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(30, 144, 255, 0.6);
+      transition: background 0.3s ease, box-shadow 0.3s ease;
+      user-select: none;
+    }
+    #btn-actualizar:hover {
+      background: linear-gradient(90deg, #3b82f6, #1e90ff);
+      box-shadow: 0 8px 28px rgba(30, 144, 255, 0.8);
+    }
+
+    #noticias-list {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    article {
+      background-color: #1e293b;
+      padding: 20px 24px;
+      border-radius: 14px;
+      box-shadow: 0 6px 24px rgba(30, 144, 255, 0.3);
+      transition: box-shadow 0.3s ease;
+    }
+    article:hover {
+      box-shadow: 0 10px 40px rgba(30, 144, 255, 0.6);
+    }
+
+    article a {
+      font-weight: 700;
+      font-size: 1.3rem;
+      color: #1e90ff;
+      text-decoration: none;
+      user-select: text;
+    }
+    article a:hover {
+      text-decoration: underline;
+    }
+
+    article p {
+      margin: 12px 0 10px 0;
+      font-size: 1rem;
+      line-height: 1.5;
+      color: #cbd5e1;
+      user-select: text;
+    }
+
+    article small {
+      color: #94a3b8;
+      font-size: 0.85rem;
+      user-select: none;
+    }
+
+    /* Mensaje de carga y error */
+    .loading, .error {
+      text-align: center;
+      font-style: italic;
+      font-size: 1.2rem;
+      color: #94a3b8;
+      margin-top: 40px;
+      user-select: none;
+    }
+    .error {
+      color: #ff6b6b;
+      font-weight: 700;
+    }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 2rem;
+      }
+      article a {
+        font-size: 1.1rem;
+      }
+      article p {
+        font-size: 0.95rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Noticias de Fútbol Europeo</h1>
+  <button id="btn-actualizar">Actualizar Noticias</button>
+  <div id="noticias-list" class="loading">Cargando noticias...</div>
+
+  <script>
+    const API_KEY = '5532fde0492f4cd49f329b2ad152233f'; // Reemplaza con tu clave real
+
+    async function cargarNoticias() {
+      const contenedor = document.getElementById('noticias-list');
+      contenedor.classList.remove('error');
+      contenedor.classList.add('loading');
+      contenedor.textContent = 'Cargando noticias...';
+
+      const url = `https://newsapi.org/v2/everything?` +
+                  `q=fútbol OR football&` +
+                  `language=es&` +
+                  `sortBy=publishedAt&` +
+                  `pageSize=10&` +
+                  `apiKey=${API_KEY}`;
+
+      try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
+
+        const data = await response.json();
+
+        if (!data.articles || data.articles.length === 0) {
+          contenedor.classList.remove('loading');
+          contenedor.textContent = 'No se encontraron noticias.';
+          return;
+        }
+
+        contenedor.classList.remove('loading');
+        contenedor.innerHTML = data.articles.map(article => `
+          <article>
+            <a href="${article.url}" target="_blank" rel="noopener">${article.title}</a>
+            <p>${article.description || ''}</p>
+            <small>Publicado: ${new Date(article.publishedAt).toLocaleString()}</small>
+          </article>
+        `).join('');
+      } catch (error) {
+        contenedor.classList.remove('loading');
+        contenedor.classList.add('error');
+        contenedor.textContent = 'Error al cargar las noticias.';
+        console.error(error);
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', cargarNoticias);
+    document.getElementById('btn-actualizar').addEventListener('click', cargarNoticias);
+  </script>
+</body>
+</html>

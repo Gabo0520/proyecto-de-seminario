@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Máximos Goleadores - Top 5 Ligas Europeas</title>
+  <style>
+    /* Fondo oscuro y tipografía */
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 20px;
+      background-color: #121212;
+      color: #e0e0e0;
+      max-width: 1000px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    h1 {
+      text-align: center;
+      color: #1e90ff;
+      margin-bottom: 30px;
+      text-shadow: 0 0 10px #1e90ffaa;
+    }
+
+    /* Tabla estilizada */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: #1e1e1e;
+      box-shadow: 0 0 15px rgba(30, 144, 255, 0.4);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    thead tr {
+      background-color: #1e90ff;
+      color: white;
+      font-weight: 600;
+      font-size: 1.1em;
+    }
+
+    th, td {
+      padding: 14px 20px;
+      text-align: left;
+      border-bottom: 1px solid #333;
+    }
+
+    tbody tr:hover {
+      background-color: #333a50;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    /* Estilo para las fotos de jugador (si decides agregar) */
+    .player-photo {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      margin-right: 12px;
+      vertical-align: middle;
+      border: 2px solid #1e90ff;
+      object-fit: cover;
+    }
+
+    /* Mensajes de carga y error */
+    .loading, .error {
+      text-align: center;
+      font-style: italic;
+      font-size: 1.2em;
+      margin-top: 40px;
+    }
+
+    .error {
+      color: #ff4c4c;
+      font-weight: bold;
+    }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      th, td {
+        padding: 10px 8px;
+        font-size: 0.9em;
+      }
+      h1 {
+        font-size: 1.5em;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Máximos Goleadores - Temporada Actual</h1>
+  <div id="jugadores-list" class="loading">Cargando datos...</div>
+
+  <script>
+    async function cargarGoleadores() {
+      const contenedor = document.getElementById('jugadores-list');
+      try {
+        const respuesta = await fetch('http://localhost:3000/api/scorers');
+        if (!respuesta.ok) throw new Error(`Error ${respuesta.status}: ${respuesta.statusText}`);
+
+        const datos = await respuesta.json();
+        if (!datos.success || !Array.isArray(datos.data)) {
+          contenedor.innerHTML = '<p class="error">No se encontraron datos de goleadores.</p>';
+          return;
+        }
+
+        let todosJugadores = [];
+        datos.data.forEach(leagueData => {
+          const ligaNombre = leagueData.leagueName || leagueData.league;
+          const goleadores = leagueData.scorers || [];
+
+          goleadores.forEach(j => {
+            todosJugadores.push({
+              nombre: j.player.name,
+              goles: j.goals,
+              equipo: j.team.name,
+              liga: ligaNombre,
+              foto: j.player.photo || '',
+              nacionalidad: j.player.nationality || 'Desconocida'
+            });
+          });
+        });
+
+        if (todosJugadores.length === 0) {
+          contenedor.innerHTML = '<p class="error">No se encontraron goleadores para las ligas seleccionadas.</p>';
+          return;
+        }
+
+        // Ordenar por goles descendente
+        todosJugadores.sort((a, b) => b.goles - a.goles);
+
+        const html = `
+          <table>
+            <thead>
+              <tr>
+                <th>Jugador</th>
+                <th>Goles</th>
+                <th>Equipo</th>
+                <th>Liga</th>
+                <th>Nacionalidad</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${todosJugadores.map(jugador => `
+                <tr>
+                  <td> ${jugador.nombre}</td>
+                  <td>${jugador.goles}</td>
+                  <td>${jugador.equipo}</td>
+                  <td>${jugador.liga}</td>
+                  <td>${jugador.nacionalidad}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        `;
+
+        contenedor.innerHTML = html;
+
+      } catch (error) {
+        contenedor.innerHTML = `<p class="error">Error al cargar datos: ${error.message}</p>`;
+        console.error(error);
+      }
+    }
+
+    cargarGoleadores();
+  </script>
+</body>
+</html>

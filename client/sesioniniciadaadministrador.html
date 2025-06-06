@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Panel Administrador - Fútbol</title>
+  <style>
+    body {
+      background: linear-gradient(135deg, #232526, #414345);
+      color: #e0e0e0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 1100px;
+      margin: 40px auto;
+      background: rgba(30,30,30,0.97);
+      border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+      padding: 32px 24px;
+    }
+    h1 {
+      text-align: center;
+      color: #1e90ff;
+      margin-bottom: 30px;
+    }
+    .admin-panel {
+      margin-top: 40px;
+      background: #222d3b;
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.3);
+    }
+    .admin-panel h2 {
+      color: #63b3ed;
+      margin-bottom: 18px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 24px;
+      background: #1e1e1e;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    th, td {
+      padding: 12px 10px;
+      text-align: center;
+      border-bottom: 1px solid #334155;
+    }
+    th {
+      background: #334155;
+      color: #60a5fa;
+      font-weight: 700;
+    }
+    tr:last-child td {
+      border-bottom: none;
+    }
+    .btn {
+      padding: 7px 14px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 1em;
+      margin: 0 2px;
+      transition: background 0.2s;
+    }
+    .btn-edit { background: #60a5fa; color: #fff; }
+    .btn-delete { background: #ef4444; color: #fff; }
+    .btn-role { background: #10b981; color: #fff; }
+    .btn[disabled] { background: #888; cursor: not-allowed; }
+    .success { color: #10b981; margin-bottom: 10px; }
+    .error { color: #ef4444; margin-bottom: 10px; }
+    @media (max-width: 700px) {
+      .container { padding: 10px 2px; }
+      th, td { font-size: 0.95em; padding: 8px 2px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Bienvenido, Administrador</h1>
+
+    <!-- Aquí van las funciones normales del usuario (puedes incluir tus secciones de partidos, equipos, etc.) -->
+    <section>
+      <!-- Ejemplo: -->
+      <h2 style="color:#60a5fa;">Funciones de Usuario</h2>
+      <p>Puedes ver partidos, equipos, estadísticas, etc. (Aquí va tu contenido de usuario normal)</p>
+    </section>
+
+    <!-- Panel de administración -->
+    <div class="admin-panel">
+      <h2>Gestión de Usuarios</h2>
+      <div class="success" id="admin-success"></div>
+      <div class="error" id="admin-error"></div>
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Usuario</th>
+            <th>Email</th>
+            <th>Rol</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="users-table-body">
+          <!-- Aquí se cargan los usuarios dinámicamente -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    // Cargar usuarios al iniciar
+    document.addEventListener('DOMContentLoaded', fetchUsers);
+
+    async function fetchUsers() {
+      const tbody = document.getElementById('users-table-body');
+      const errorDiv = document.getElementById('admin-error');
+      const successDiv = document.getElementById('admin-success');
+      tbody.innerHTML = '<tr><td colspan="5">Cargando usuarios...</td></tr>';
+      errorDiv.textContent = '';
+      successDiv.textContent = '';
+
+      try {
+        // Cambia la URL por la de tu backend real
+        const res = await fetch('http://localhost:3000/api/usuarios');
+        if (!res.ok) throw new Error('No se pudieron cargar los usuarios');
+        const data = await res.json();
+
+        if (!data.usuarios || data.usuarios.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="5">No hay usuarios registrados.</td></tr>';
+          return;
+        }
+        tbody.innerHTML = '';
+        data.usuarios.forEach(user => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${user.id}</td>
+            <td>${user.username}</td>
+            <td>${user.email}</td>
+            <td>${user.isAdmin ? 'Administrador' : 'Usuario'}</td>
+            <td>
+              <button class="btn btn-edit" onclick="editUser(${user.id})">Editar</button>
+              <button class="btn btn-delete" onclick="deleteUser(${user.id})">Eliminar</button>
+              <button class="btn btn-role" onclick="toggleRole(${user.id}, ${user.isAdmin})">
+                ${user.isAdmin ? 'Quitar Admin' : 'Dar Admin'}
+              </button>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+      } catch (err) {
+        errorDiv.textContent = err.message;
+        tbody.innerHTML = '';
+      }
+    }
+
+    // Eliminar usuario
+    async function deleteUser(id) {
+      if (!confirm('¿Seguro que deseas eliminar este usuario?')) return;
+      const errorDiv = document.getElementById('admin-error');
+      const successDiv = document.getElementById('admin-success');
+      errorDiv.textContent = '';
+      successDiv.textContent = '';
+      try {
+        const res = await fetch(`http://localhost:3000/api/usuarios/${id}`, { method: 'DELETE' });
+        if (!res.ok) throw new Error('No se pudo eliminar el usuario');
+        successDiv.textContent = 'Usuario eliminado correctamente.';
+        fetchUsers();
+      } catch (err) {
+        errorDiv.textContent = err.message;
+      }
+    }
+
+    // Editar usuario (puedes expandir esto con un modal o formulario)
+    function editUser(id) {
+      alert('Funcionalidad de edición de usuario no implementada aún. ID: ' + id);
+      // Aquí puedes abrir un modal para editar datos del usuario
+    }
+
+    // Cambiar rol de usuario
+    async function toggleRole(id, isAdmin) {
+      const errorDiv = document.getElementById('admin-error');
+      const successDiv = document.getElementById('admin-success');
+      errorDiv.textContent = '';
+      successDiv.textContent = '';
+      try {
+        const res = await fetch(`http://localhost:3000/api/usuarios/${id}/rol`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ isAdmin: !isAdmin })
+        });
+        if (!res.ok) throw new Error('No se pudo cambiar el rol');
+        successDiv.textContent = 'Rol actualizado correctamente.';
+        fetchUsers();
+      } catch (err) {
+        errorDiv.textContent = err.message;
+      }
+    }
+  </script>
+</body>
+</html>

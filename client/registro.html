@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Crear Cuenta - MatchPulse</title>
+  <style>
+    /* Fondo oscuro degradado */
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #e0e0e0;
+    }
+
+    /* Contenedor del registro */
+    .register-container {
+      background-color: #1f2937;
+      padding: 40px 35px;
+      border-radius: 12px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.7);
+      width: 360px;
+      text-align: center;
+      transition: transform 0.3s ease;
+    }
+    .register-container:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.9);
+    }
+
+    /* Logo */
+    .logo {
+      width: 140px;
+      margin-bottom: 25px;
+      filter: drop-shadow(0 0 5px #1e90ff);
+    }
+
+    /* Título */
+    h1 {
+      margin-bottom: 30px;
+      font-weight: 700;
+      font-size: 28px;
+      color: #1e90ff;
+      text-shadow: 0 0 10px #1e90ffaa;
+    }
+
+    /* Grupos de inputs */
+    .input-group {
+      margin-bottom: 22px;
+      text-align: left;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #a0aec0;
+      user-select: none;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px 15px;
+      border-radius: 8px;
+      border: none;
+      background-color: #2d3748;
+      color: #e0e0e0;
+      font-size: 16px;
+      box-shadow: inset 0 0 6px #000000aa;
+      transition: background-color 0.3s, box-shadow 0.3s;
+    }
+    input::placeholder {
+      color: #718096;
+    }
+    input:focus {
+      outline: none;
+      background-color: #1e293b;
+      box-shadow: 0 0 8px #1e90ff;
+    }
+
+    /* Botón */
+    button {
+      width: 100%;
+      padding: 14px;
+      border-radius: 8px;
+      border: none;
+      background: linear-gradient(90deg, #1e90ff, #3b82f6);
+      color: white;
+      font-weight: 700;
+      font-size: 16px;
+      cursor: pointer;
+      box-shadow: 0 6px 15px rgba(30, 144, 255, 0.6);
+      transition: background 0.3s ease, box-shadow 0.3s ease;
+      user-select: none;
+    }
+    button:hover {
+      background: linear-gradient(90deg, #3b82f6, #1e90ff);
+      box-shadow: 0 8px 20px rgba(30, 144, 255, 0.8);
+    }
+    button:active {
+      transform: scale(0.98);
+    }
+
+    /* Enlace para login */
+    .login-link {
+      display: block;
+      margin-top: 16px;
+      color: #94a3b8;
+      font-size: 14px;
+      text-decoration: none;
+      user-select: none;
+      transition: color 0.3s ease;
+    }
+    .login-link:hover {
+      color: #1e90ff;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="register-container">
+    <img src="img/LOGO new.png" alt="MatchPulse Logo" class="logo" />
+    <h1>Crear Cuenta</h1>
+
+    <div class="input-group">
+      <label for="nombre">Nombre Completo</label>
+      <input type="text" id="nombre" placeholder="Ingresa tu nombre completo" />
+    </div>
+
+    <div class="input-group">
+      <label for="email">Correo Electrónico</label>
+      <input type="email" id="email" placeholder="Ingresa tu email" />
+    </div>
+
+    <div class="input-group">
+      <label for="password">Contraseña</label>
+      <input type="password" id="password" placeholder="Crea una contraseña" />
+    </div>
+
+    <div class="input-group">
+      <label for="confirm-password">Confirmar Contraseña</label>
+      <input type="password" id="confirm-password" placeholder="Repite tu contraseña" />
+    </div>
+
+    <!-- Agrega este input group después del confirmar contraseña -->
+<div class="input-group">
+  <label for="equipos-favoritos">Equipos Favoritos (Opcional)</label>
+  <input 
+    type="text" 
+    id="equipos-favoritos"
+    list="equipos-lista"
+    placeholder="Escribe o selecciona tus equipos"
+    style="width: 100%"
+  >
+  <datalist id="equipos-lista">
+    <!-- Premier League -->
+    <option value="Manchester City">
+    <option value="Liverpool">
+    <option value="Chelsea">
+    <option value="Arsenal">
+<option value="Aston Villa">
+<option value="AFC Bournemouth">
+<option value="Brentford">
+<option value="Brighton & Hove Albion">
+<option value="Crystal Palace">
+<option value="Everton">
+<option value="Fulham">
+<option value="Manchester United">
+<option value="Newcastle United">
+<option value="Nottingham Forest">
+<option value="Tottenham Hotspur">
+<option value="West Ham United">
+<option value="Wolverhampton Wanderers">
+    
+    <!-- La Liga -->
+    <option value="Alavés">
+<option value="Athletic Club">
+<option value="Atlético de Madrid">
+<option value="Barcelona">
+<option value="Las Palmas">
+<option value="Celta de Vigo">
+<option value="Real Valladolid">
+<option value="Espanyol">
+<option value="Getafe">
+<option value="Girona">
+<option value="Leganes">
+<option value="Mallorca">
+<option value="Osasuna">
+<option value="Rayo Vallecano">
+<option value="Real Betis">
+<option value="Real Madrid">
+<option value="Real Sociedad">
+<option value="Sevilla">
+<option value="Valencia">
+<option value="Villarreal">
+    
+    
+    <!-- Bundesliga -->
+    <option value="Bayern Múnich">
+    <option value="Borussia Dortmund">
+    <option value="Bayer 04 Leverkusen">
+<option value="VfB Stuttgart">
+<option value="RB Leipzig">
+<option value="Eintracht Frankfurt">
+<option value="TSG Hoffenheim">
+<option value="1. FC Heidenheim 1846">
+<option value="SV Werder Bremen">
+<option value="SC Freiburg">
+<option value="FC Augsburg">
+<option value="VfL Wolfsburg">
+<option value="1. FSV Mainz 05">
+<option value="Borussia Mönchengladbach">
+<option value="Union Berlin">
+<option value="VfL Bochum">
+<option value="FC St. Pauli">
+<option value="Holstein Kiel">
+
+    <!-- Serie A -->
+<option value="Juventus">
+<option value="AC Milan">
+<option value="Atalanta">
+<option value="Bologna">
+<option value="Cagliari">
+<option value="Como">
+<option value="Empoli">
+<option value="Fiorentina">
+<option value="Genoa">
+<option value="Hellas Verona">
+<option value="Inter de Milán">
+<option value="Lazio">
+<option value="Lecce">
+<option value="Monza">
+<option value="Napoli">
+<option value="Parma">
+<option value="Roma">
+<option value="Torino">
+<option value="Udinese">
+<option value="Venezia">
+    <!-- Ligue 1 -->
+     <option value="Paris Saint-Germain">
+<option value="AS Monaco">
+<option value="Stade Brestois 29">
+<option value="Lille OSC">
+<option value="OGC Nice">
+<option value="Olympique Lyonnais">
+<option value="Olympique de Marseille">
+<option value="RC Lens">
+<option value="Stade Rennais FC">
+<option value="Stade de Reims">
+<option value="Montpellier Hérault SC">
+<option value="RC Strasbourg Alsace">
+<option value="Toulouse FC">
+<option value="FC Nantes">
+<option value="Le Havre AC">
+<option value="AS Saint-Étienne">
+<option value="Angers SCO">
+<option value="AJ Auxerre">
+
+  </datalist>
+</div>
+
+
+
+
+    <button id="register-button">CREAR CUENTA</button>
+    <a href="login.html" class="login-link">¿Ya tienes cuenta? Iniciar Sesión</a>
+  </div>
+
+  <script>
+    document.getElementById('register-button').addEventListener('click', async function(e) {
+      e.preventDefault();
+
+      const nombre = document.getElementById('nombre').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const confirmPassword = document.getElementById('confirm-password').value;
+      const equiposFavoritos = document.getElementById('equipos-favoritos').value.trim();
+
+      // Validaciones
+      if (!nombre || !email || !password || !confirmPassword) {
+        alert('Por favor complete todos los campos');
+        return;
+      }
+
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        alert('Por favor ingrese un email válido');
+        return;
+      }
+
+      if (password.length < 8) {
+        alert('La contraseña debe tener al menos 8 caracteres');
+        return;
+      }
+
+      if (password !== confirmPassword) {
+        alert('Las contraseñas no coinciden');
+        return;
+      }
+
+      try {
+        const response = await fetch('http://localhost:3000/registro', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+        nombre, 
+        email, 
+        password,
+        equiposFavoritos // Agregar este campo
+      })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Error al registrar el usuario');
+        }
+
+        alert(data.mensaje);
+        window.location.href = 'login.html';
+
+      } catch (error) {
+        alert(error.message);
+      }
+    });
+  </script>
+</body>
+</html>

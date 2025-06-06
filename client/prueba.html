@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MatchPulse - Partidos en Vivo y Próximos</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background-color: #f5f5f5;
+      color: #333;
+    }
+    h1, h2 {
+      text-align: center;
+      color: #2c3e50;
+    }
+    .section-title {
+      margin-top: 40px;
+      margin-bottom: 10px;
+      font-weight: bold;
+      font-size: 1.5em;
+      color: #007bff;
+    }
+    #filter-container {
+      max-width: 300px;
+      margin: 0 auto 20px auto;
+      text-align: center;
+    }
+    input[type="date"] {
+      padding: 5px;
+      font-size: 1em;
+    }
+    button {
+      padding: 6px 12px;
+      font-size: 1em;
+      margin-left: 8px;
+      cursor: pointer;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+    }
+    .matches-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill,minmax(280px,1fr));
+      gap: 15px;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    .match-card {
+      background: white;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+    .match-card:hover {
+      background-color: #e9f0ff;
+    }
+    .match-teams {
+      font-weight: bold;
+      font-size: 1.1em;
+      margin-bottom: 8px;
+    }
+    #match-details {
+      max-width: 700px;
+      margin: 30px auto;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+    #match-details h3 {
+      margin-top: 0;
+      color: #007bff;
+    }
+    #match-details p {
+      margin: 6px 0;
+    }
+    .loading, .error {
+      text-align: center;
+      font-style: italic;
+      margin-top: 20px;
+    }
+    .error {
+      color: #dc3545;
+      font-weight: bold;
+      font-style: normal;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>MatchPulse - Partidos en Vivo y Próximos</h1>
+
+  <div id="filter-container">
+    <label for="filter-date">Filtrar próximos partidos por fecha:</label>
+    <input type="date" id="filter-date" />
+    <button id="filter-btn">Filtrar</button>
+  </div>
+
+  <section>
+    <h2 class="section-title">Partidos en Vivo</h2>
+    <div id="live-matches" class="matches-grid"></div>
+  </section>
+
+  <section>
+    <h2 class="section-title">Próximos Partidos</h2>
+    <div id="upcoming-matches" class="matches-grid"></div>
+  </section>
+
+  <section id="match-details" style="display:none;">
+    <h3>Detalle del Partido</h3>
+    <div id="match-info"></div>
+  </section>
+
+  <div id="message" class="loading"></div>
+
+  <script>
+    const API_KEY = 'c439da86b9114f9690b8574fa46537fb'; // Reemplaza con tu API key de football-data.org
+    const BASE_URL = 'http://localhost:3000/api';
+
+
+async function fetchMatches(status, dateFrom, dateTo) {
+  let url = `${BASE_URL}/matches?status=${status}`;
+  if (dateFrom) url += `&dateFrom=${dateFrom}`;
+  if (dateTo) url += `&dateTo=${dateTo}`;
+
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`Error ${res.status}: ${res.statusText}`);
+  return res.json();
+}
+
+
+    function createMatchCard(match) {
+      const date = new Date(match.utcDate).toLocaleString();
+      return `
+        <div class="match-card" data-id="${match.id}">
+          <div class="match-teams">${match.homeTeam.name} vs ${match.awayTeam.name}</div>
+          <div>Fecha: ${date}</div>
+          <div>Estado: ${match.status}</div>
+        </div>
+      `;
+    }
+
+    function mostrarPartidos(containerId, partidos) {
+      const contenedor = document.getElementById(containerId);
+      if (!partidos || partidos.length === 0) {
+        contenedor.innerHTML = '<p>No hay partidos para mostrar.</p>';
+        return;
+      }
+      contenedor.innerHTML = partidos.map(createMatchCard).join('');
+      // Agregar evento click para cada partido
+      contenedor.querySelectorAll('.match-card').forEach(card => {
+        card.addEventListener('click', () => {
+          const matchId = card.getAttribute('data-id');
+          mostrarDetallePartido(matchId);
+        });
+      });
+    }
+
+async function mostrarDetallePartido(matchId) {
+  try {
+    const res = await fetch(`${BASE_URL}/match/${matchId}`);
+    if (!res.ok) throw new Error(`Error ${res.status}: ${res.statusText}`);
+    const data = await res.json();
+    const m = data.match;
+
+    const detailsDiv = document.getElementById('match-info');
+    const section = document.getElementById('match-details');
+    section.style.display = 'block';
+
+    detailsDiv.innerHTML = `
+      <p><strong>${m.homeTeam.name}</strong> vs <strong>${m.awayTeam.name}</strong></p>
+      <p>Estado: ${m.status}</p>
+      <p>Fecha: ${new Date(m.utcDate).toLocaleString()}</p>
+      <p>Resultado: ${m.score.fullTime.home ?? '-'} - ${m.score.fullTime.away ?? '-'}</p>
+      <p>Competición: ${m.competition.name}</p>
+    `;
+  } catch (error) {
+    console.error(error);
+    alert('Error al cargar detalles del partido.');
+  }
+}
+
+
+    async function cargarPartidos() {
+      const messageDiv = document.getElementById('message');
+      messageDiv.textContent = 'Cargando partidos en vivo...';
+      try {
+        const liveData = await fetchMatches('LIVE');
+        mostrarPartidos('live-matches', liveData.matches);
+        messageDiv.textContent = '';
+
+        const today = new Date().toISOString().split('T')[0];
+        const weekLater = new Date(Date.now() + 7*24*60*60*1000).toISOString().split('T')[0];
+        messageDiv.textContent = 'Cargando próximos partidos...';
+        const upcomingData = await fetchMatches('SCHEDULED', today, weekLater);
+        mostrarPartidos('upcoming-matches', upcomingData.matches);
+        messageDiv.textContent = '';
+      } catch (error) {
+        messageDiv.textContent = 'Error al cargar partidos. Intenta recargar la página.';
+        console.error(error);
+      }
+    }
+
+    document.getElementById('filter-btn').addEventListener('click', async () => {
+      const fecha = document.getElementById('filter-date').value;
+      if (!fecha) return alert('Selecciona una fecha para filtrar');
+      try {
+        const data = await fetchMatches('SCHEDULED', fecha, fecha);
+        mostrarPartidos('upcoming-matches', data.matches);
+      } catch (error) {
+        alert('Error al filtrar partidos');
+        console.error(error);
+      }
+    });
+
+    window.onload = cargarPartidos;
+  </script>
+</body>
+</html>

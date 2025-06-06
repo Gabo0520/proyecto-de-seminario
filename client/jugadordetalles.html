@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Detalles del Jugador</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      color: #e0e0e0;
+      margin: 0;
+      padding: 40px 20px;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+      box-sizing: border-box;
+      min-height: 100vh;
+    }
+    h1 {
+      text-align: center;
+      color: #1e90ff;
+      text-shadow: 0 0 10px #1e90ffaa;
+      margin-bottom: 30px;
+    }
+    .player-container {
+      background-color: #1f2937;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.7);
+    }
+    .player-photo {
+      display: block;
+      margin: 0 auto 20px auto;
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      object-fit: cover;
+      box-shadow: 0 0 15px #1e90ffcc;
+    }
+    .player-info {
+      text-align: center;
+      font-size: 1.1rem;
+    }
+    .player-info p {
+      margin: 8px 0;
+    }
+    .label {
+      font-weight: 700;
+      color: #63b3ed;
+    }
+    .loading, .error {
+      text-align: center;
+      font-size: 1.2rem;
+      margin-top: 40px;
+    }
+    .loading {
+      color: #a0aec0;
+      font-style: italic;
+    }
+    .error {
+      color: #ff6b6b;
+      text-shadow: 0 0 5px #ff6b6baa;
+    }
+    a.back-link {
+      display: inline-block;
+      margin-top: 30px;
+      color: #1e90ff;
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.3s;
+    }
+    a.back-link:hover {
+      color: #63b3ed;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <h1>Detalles del Jugador</h1>
+
+<div id="loading" class="loading">Cargando información...</div>
+<div id="error" class="error" style="display:none;"></div>
+<div id="player-details" class="player-container" style="display:none;">
+  <img id="player-photo" class="player-photo" src="" alt="Foto del jugador" />
+  <div class="player-info">
+    <p><span class="label">Nombre:</span> <span id="player-name"></span></p>
+    <p><span class="label">Edad:</span> <span id="player-age"></span></p>
+    <p><span class="label">Nacionalidad:</span> <span id="player-nationality"></span></p>
+    <p><span class="label">Equipo:</span> <span id="player-team"></span></p>
+    <p><span class="label">Posición:</span> <span id="player-position"></span></p>
+    <p><span class="label">Partidos:</span> <span id="player-matches"></span></p>
+    <p><span class="label">Goles:</span> <span id="player-goals"></span></p>
+  </div>
+</div>
+
+
+
+
+<script>
+const urlParams = new URLSearchParams(window.location.search);
+const playerId = urlParams.get('id');
+
+async function fetchPlayerDetails() {
+  if (!playerId) {
+    document.getElementById('error').textContent = 'No se especificó el jugador.';
+    return;
+  }
+  try {
+    const response = await fetch(`http://localhost:3000/api/player/${playerId}`);
+    if (!response.ok) throw new Error(`Error ${response.status}: ${response.statusText}`);
+
+    const data = await response.json();
+    const player = data.player;
+    const stats = data.statistics[0];
+
+    document.getElementById('player-photo').src = player.photo || 'img/default-player.png';
+    document.getElementById('player-name').textContent = player.name || 'N/A';
+    document.getElementById('player-age').textContent = player.age || 'N/A';
+    document.getElementById('player-nationality').textContent = player.nationality || 'N/A';
+    document.getElementById('player-team').textContent = stats.team.name || 'N/A';
+    document.getElementById('player-position').textContent = stats.games.position || 'N/A';
+    document.getElementById('player-matches').textContent = stats.games.appearences || 'N/A';
+    document.getElementById('player-goals').textContent = stats.goals.total || 'N/A';
+
+    document.getElementById('player-details').style.display = 'block';
+    document.getElementById('loading').style.display = 'none';
+  } catch (error) {
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('error').textContent = `Error al cargar los detalles del jugador: ${error.message}`;
+  }
+}
+fetchPlayerDetails();
+</script>
+
+</body>
+</html>

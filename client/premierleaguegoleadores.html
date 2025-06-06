@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <title>Máximos Goleadores - Premier League 2024/2025</title>
+    <style>
+        /* Fondo oscuro degradado */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 20px auto;
+            max-width: 700px;
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            color: #e0e0e0;
+            min-height: 100vh;
+            padding: 40px 20px;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            text-align: center;
+            font-weight: 700;
+            font-size: 2.2rem;
+            color: #1e90ff;
+            text-shadow: 0 0 12px #1e90ffaa;
+            margin-bottom: 30px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 10px;
+            background-color: #1f2937;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.7);
+            overflow: hidden;
+        }
+
+        thead tr {
+            background-color: #111f3c;
+            color: #a0aec0;
+            font-weight: 600;
+            font-size: 1rem;
+            text-transform: uppercase;
+        }
+
+        th, td {
+            padding: 14px 20px;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        tbody tr {
+            background-color: #273549;
+            transition: background-color 0.3s ease;
+            cursor: default;
+        }
+
+        tbody tr:hover {
+            background-color: #1e90ff;
+            color: white;
+            box-shadow: 0 0 12px #1e90ffcc;
+        }
+
+        .player-photo {
+            height: 40px;
+            width: 40px;
+            object-fit: cover;
+            border-radius: 50%;
+            vertical-align: middle;
+            margin-right: 12px;
+            box-shadow: 0 0 6px #1e90ffaa;
+        }
+
+        td:first-child {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #1e90ff;
+        }
+
+        .error {
+            color: #ff6b6b;
+            margin-top: 30px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 1.1rem;
+            text-shadow: 0 0 5px #ff6b6baa;
+        }
+
+        .loading {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 1.1rem;
+            color: #a0aec0;
+            font-style: italic;
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 20px 10px;
+            }
+            th, td {
+                padding: 10px 8px;
+                font-size: 0.9rem;
+            }
+            .player-photo {
+                height: 32px;
+                width: 32px;
+                margin-right: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Máximos Goleadores - Premier League 2024/2025</h1>
+
+    <div id="loading" class="loading">Cargando datos...</div>
+    <div id="error-message" class="error"></div>
+
+    <table id="scorers-table" style="display:none;">
+        <thead>
+            <tr>
+                <th>Posición</th>
+                <th>Jugador</th>
+                <th>Equipo</th>
+                <th>Goles</th>
+            </tr>
+        </thead>
+        <tbody id="scorers-body"></tbody>
+    </table>
+
+    <script>
+        const scorersTable = document.getElementById('scorers-table');
+        const scorersBody = document.getElementById('scorers-body');
+        const loadingDiv = document.getElementById('loading');
+        const errorMessage = document.getElementById('error-message');
+
+        async function fetchTopScorers() {
+            loadingDiv.style.display = 'block';
+            errorMessage.textContent = '';
+            scorersTable.style.display = 'none';
+            scorersBody.innerHTML = '';
+
+            try {
+                const response = await fetch('http://localhost:3000/api/topscorers/PL');
+                if (!response.ok) throw new Error(`Error ${response.status}: ${response.statusText}`);
+
+                const data = await response.json();
+
+                if (!data.scorers || data.scorers.length === 0) {
+                    errorMessage.textContent = 'No se encontraron goleadores para la Premier League.';
+                    loadingDiv.style.display = 'none';
+                    return;
+                }
+
+                data.scorers.forEach((scorer, index) => {
+                    const tr = document.createElement('tr');
+
+                    tr.innerHTML = `
+                        <td>${index + 1}</td>
+                        <td>
+                            ${scorer.player.photo ? `<img src="${scorer.player.photo}" alt="${scorer.player.name}" class="player-photo" />` : ''}
+                            ${scorer.player.name}
+                        </td>
+                        <td>${scorer.team.name}</td>
+                        <td>${scorer.goals}</td>
+                    `;
+                    scorersBody.appendChild(tr);
+                });
+
+                scorersTable.style.display = 'table';
+                loadingDiv.style.display = 'none';
+            } catch (error) {
+                loadingDiv.style.display = 'none';
+                errorMessage.textContent = `Error al cargar los datos: ${error.message}`;
+            }
+        }
+
+        fetchTopScorers();
+    </script>
+</body>
+</html>

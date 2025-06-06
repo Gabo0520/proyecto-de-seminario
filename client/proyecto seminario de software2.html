@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MatchPulse</title>
+    <link rel="stylesheet" href="slider.css">
+</head>
+<body>
+    <nav class="navbar">
+        <img src="img/LOGO new.png" alt="Logo" class="logo">
+        <ul>
+            <li><a href="#">Inicio</a></li>
+            <li><a href="partidosenvivo.html">Partidos en Vivo</a></li>
+            <li><a href="noticias.html">Noticias</a></li>
+            <li><a href="jugadores.html">Jugadores</a></li>
+            
+        </ul>
+<div style="position: relative; width: 200px;">
+<input type="text" id="search-input" placeholder="Buscar equipos..." oninput="fetchTeams()" style="width: 100%; padding: 8px 12px 8px 8px; font-size: 16px; border: 1px solid #ccc; border-radius: 4px;" />
+<button id="search-button" onclick="fetchTeams()" style="position: absolute; right: 4px; top: 50%; transform: translateY(-50%); border: none; background: transparent; cursor: pointer; padding: 0;">
+<img src="img/lupa.png" alt="Buscar" style="width: 24px; height: 24px;" />
+</button>
+<div id="search-results" style="position: absolute; background: white; border: 1px solid #ccc; max-height: 200px; overflow-y: auto; width: 100%; display: none; z-index: 1000;"></div>
+</div>
+
+        <button class="login-button" onclick="window.location.href='login.html'">INICIAR SESIÓN</button>
+    </nav>
+
+    <div class="spacer" style="height: 170px;"></div>
+
+    <div class="slider">
+        <div class="slider-track">
+            <div class="slide"><img src="img/Premier.png" alt="Premier League"></div>
+            <div class="slide"><img src="img/bundesliga.png" alt="Bundesliga"></div>
+            <div class="slide"><img src="img/Serie_A.png" alt="Serie A"></div>
+            <div class="slide"><img src="img/francesa.png" alt="Ligue 1"></div>
+            <div class="slide"><img src="img/laliga.png" alt="La Liga"></div>
+            <div class="slide"><img src="img/Premier.png" alt="Premier League"></div>
+            <div class="slide"><img src="img/bundesliga.png" alt="Bundesliga"></div>
+            <div class="slide"><img src="img/Serie_A.png" alt="Serie A"></div>
+            <div class="slide"><img src="img/francesa.png" alt="Ligue 1"></div>
+            <div class="slide"><img src="img/laliga.png" alt="La Liga"></div>
+        </div>
+    </div>
+
+<div class="text-slider">
+    <div class="text-slider-track">
+        <div class="text-slide active">
+            <h2>¿Qué es MatchPulse?</h2>
+            <p>       
+                 MatchPulse es una plataforma que te mantiene actualizado con los últimos partidos y noticias deportivas de las 5 grandes ligas de Europa. 
+        Nuestra misión es brindarte información en tiempo real para que no te pierdas ningún detalle de tus equipos y jugadores favoritos.
+    </p>
+        </div>
+        <div class="text-slide">
+            <h2>Características</h2>
+            <ul>
+                <li>Partidos en vivo y resultados al instante</li>
+                <li>Noticias actualizadas sobre equipos y jugadores</li>
+                <li>Perfil personalizable para seguimiento de equipos</li>
+                <li>Notificaciones de eventos importantes</li>
+            </ul>
+        </div>
+    </div>
+    <button id="prevBtn" class="slider-button">◀</button>
+    <button id="nextBtn" class="slider-button">▶</button>
+</div>
+
+<style>
+.text-slider {
+    position: relative;
+    max-width: 1000px;
+    margin: 40px auto;
+    background: hwb(210 17% 69%);
+    padding: 20px 40px 60px 40px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    font-family: Arial, sans-serif;
+}
+
+.text-slider-track {
+    position: relative;
+    overflow: hidden;
+    height: 180px; /* Ajusta según contenido */
+    
+}
+
+.text-slide {
+    display: none;
+    position: absolute;
+    width: 100%;
+    top: 0;
+    left: 0;
+    transition: opacity 0.5s ease-in-out;
+    color: white;
+    font-size: 18px;  
+    line-height: 1.4;
+    text-align: justify;
+    max-width: 700px; 
+    margin-left: 20px;
+}
+
+.text-slide.active {
+    display: block;
+    position: relative;
+    opacity: 1;
+}
+
+.slider-button {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    z-index: 10;
+}
+#prevBtn {
+    left: 20px;
+}
+
+#nextBtn {
+    right: 20px;
+}
+
+.slider-button:hover {
+    background-color: rgb(25, 0, 255);
+}
+</style>
+
+<script>
+const slides = document.querySelectorAll('.text-slide');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+let currentIndex = 0;
+
+function showSlide(index) {
+    slides.forEach((slide, i) => {
+        slide.classList.toggle('active', i === index);
+    });
+}
+
+prevBtn.addEventListener('click', () => {
+    currentIndex = (currentIndex - 1 + slides.length) % slides.length;
+    showSlide(currentIndex);
+});
+
+nextBtn.addEventListener('click', () => {
+    currentIndex = (currentIndex + 1) % slides.length;
+    showSlide(currentIndex);
+});
+
+// Inicializar mostrando el primer slide
+showSlide(currentIndex);
+</script>
+
+
+    <section id="partidos-container" class="partidos-section" style="background-color: hwb(210 17% 69%); padding: 20px 40px 60px 40px; border-radius: 10px; max-width: 1000px; margin: 40px auto; box-shadow: 0 5px 15px rgba(0,0,0,0.1); font-family: Arial, sans-serif; color: white;">
+        <h2 class="section-title" style="display: flex; align-items: center; gap: 10px;">
+            LaLiga
+            <button class="liga-button" style="padding: 0 5px; font-size: 18px;">&#x25BC;</button>
+        </h2>
+        <ul class="liga-list" style="margin-top: 0; margin-left: 20px;">
+            <li>
+                <ul class="submenu" style="display: none; margin-left: 0; padding-left: 0;">
+                    <li><a href="Laligatabla.html?liga=PD" class="submenu-link">Tabla de posiciones</a></li>
+                    <li><a href="laligagoleadores.html?liga=PD" class="submenu-link">Goleadores</a></li>
+                </ul>
+            </li>
+        </ul>
+        <div id="laliga-matches" class="matches-grid"></div>
+
+        <h2 class="section-title" style="display: flex; align-items: center; gap: 10px;">
+            Ligue 1
+            <button class="liga-button" style="padding: 0 5px; font-size: 18px;">&#x25BC;</button>
+        </h2>
+        <ul class="liga-list" style="margin-top: 0; margin-left: 20px;">
+            <li>
+                <ul class="submenu" style="display: none; margin-left: 0; padding-left: 0;">
+                    <li><a href="ligue1tabla.html?liga=FL1" class="submenu-link">Tabla de posiciones</a></li>
+                    <li><a href="ligue1goleadores.html?liga=FL1" class="submenu-link">Goleadores</a></li>
+                </ul>
+            </li>
+        </ul>
+        <div id="ligue1-matches" class="matches-grid"></div>
+
+        <h2 class="section-title" style="display: flex; align-items: center; gap: 10px;">
+            Premier League
+            <button class="liga-button" style="padding: 0 5px; font-size: 18px;">&#x25BC;</button>
+        </h2>
+        <ul class="liga-list" style="margin-top: 0; margin-left: 20px;">
+            <li>
+                <ul class="submenu" style="display: none; margin-left: 0; padding-left: 0;">
+                    <li><a href="premiertabla.html?liga=PL" class="submenu-link">Tabla de posiciones</a></li>
+                    <li><a href="premierleaguegoleadores.html?liga=PL" class="submenu-link">Goleadores</a></li>
+                </ul>
+            </li>
+        </ul>
+        <div id="premier-matches" class="matches-grid"></div>
+
+        <h2 class="section-title" style="display: flex; align-items: center; gap: 10px;">
+            Bundesliga
+            <button class="liga-button" style="padding: 0 5px; font-size: 18px;">&#x25BC;</button>
+        </h2>
+        <ul class="liga-list" style="margin-top: 0; margin-left: 20px;">
+            <li>
+                <ul class="submenu" style="display: none; margin-left: 0; padding-left: 0;">
+                    <li><a href="bundestabla.html?liga=BL1" class="submenu-link">Tabla de posiciones</a></li>
+                    <li><a href="bundesgoleadores.html?liga=BL1" class="submenu-link">Goleadores</a></li>
+                </ul>
+            </li>
+        </ul>
+        <div id="bundesliga-matches" class="matches-grid"></div>
+
+        <h2 class="section-title" style="display: flex; align-items: center; gap: 10px;">
+            Serie A
+            <button class="liga-button" style="padding: 0 5px; font-size: 18px;">&#x25BC;</button>
+        </h2>
+        <ul class="liga-list" style="margin-top: 0; margin-left: 20px;">
+            <li>
+                <ul class="submenu" style="display: none; margin-left: 0; padding-left: 0;">
+                    <li><a href="serieAtabla.html?liga=SA" class="submenu-link">Tabla de posiciones</a></li>
+                    <li><a href="serieAgoleadores.html?liga=SA" class="submenu-link">Goleadores</a></li>
+                </ul>
+            </li>
+        </ul>
+        <div id="premier-matches" class="matches-grid"></div>
+
+        <style>
+            .section-title {
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              font-weight: 700;
+              font-size: 1.4rem;
+              margin-bottom: 12px;
+              cursor: pointer;
+              user-select: none;
+              color: #60a5fa;
+              transition: color 0.3s ease;
+            }
+            .section-title:hover {
+              color: #3b82f6;
+            }
+            .liga-button {
+              background: none;
+              border: none;
+              color: #60a5fa;
+              font-size: 1.3rem;
+              transition: transform 0.3s ease;
+              cursor: pointer;
+              padding: 0;
+              line-height: 1;
+            }
+            .liga-button.rotate {
+              transform: rotate(180deg);
+            }
+            .liga-list {
+              list-style: none;
+              margin: 0 0 20px 20px;
+              padding: 0;
+              max-width: 220px;
+              background-color: #334155;
+              border-radius: 8px;
+              box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+              overflow: hidden;
+              transition: max-height 0.4s ease;
+            }
+            .liga-list.collapsed {
+              max-height: 0;
+              padding: 0;
+              margin: 0 0 0 20px;
+              overflow: hidden;
+              box-shadow: none;
+            }
+            .liga-list li {
+              border-bottom: 1px solid #475569;
+            }
+            .liga-list li:last-child {
+              border-bottom: none;
+            }
+            .submenu-link {
+              display: block;
+              padding: 10px 16px;
+              color: #cbd5e1;
+              text-decoration: none;
+              font-size: 0.95rem;
+              transition: background-color 0.3s ease, color 0.3s ease;
+            }
+            .submenu-link:hover {
+              background-color: #3b82f6;
+              color: white;
+              border-radius: 6px;
+            }
+            .matches-grid {
+              margin-bottom: 40px;
+              /* Aquí puedes agregar estilos para los partidos si quieres */
+            }
+          </style>
+
+    <script>
+        document.querySelectorAll('.liga-button').forEach(button => {
+            button.addEventListener('click', () => {
+                console.log('Botón clickeado:', button.parentElement.textContent.trim());
+                // Buscar el ul.liga-list siguiente al h2 padre del botón
+                const h2 = button.parentElement;
+                const nextUl = h2.nextElementSibling;
+                if (nextUl && nextUl.classList.contains('liga-list')) {
+                    const submenu = nextUl.querySelector('.submenu');
+                    if (submenu.style.display === 'block') {
+                        submenu.style.display = 'none';
+                    } else {
+                        submenu.style.display = 'block';
+                    }
+                }
+            });
+        });
+    </script>
+
+<script>
+async function fetchTeams() {
+const query = document.getElementById('search-input').value.trim();
+const searchResultsContainer = document.getElementById('search-results');
+
+if (query.length === 0) {
+searchResultsContainer.innerHTML = '';
+searchResultsContainer.style.display = 'none';
+return;
+}
+
+try {
+const response = await fetch(`http://localhost:3000/api/equipos?query=${encodeURIComponent(query)}`);
+if (!response.ok) {
+throw new Error(`Error al buscar equipos: ${response.status}`);
+}
+
+const data = await response.json();
+renderResults(data.equipos || []);
+} catch (error) {
+console.error(error);
+searchResultsContainer.innerHTML = '<p>Error al buscar equipos. Inténtalo de nuevo.</p>';
+searchResultsContainer.style.display = 'block';
+}
+}
+
+function renderResults(equipos) {
+    const searchResultsContainer = document.getElementById('search-results');
+    searchResultsContainer.innerHTML = '';
+  
+    if (equipos.length === 0) {
+      searchResultsContainer.style.display = 'none';
+      return;
+    }
+  
+    const list = document.createElement('ul');
+    list.style.listStyle = 'none';
+    list.style.padding = '0';
+    list.style.margin = '0';
+  
+    equipos.forEach(team => {
+      const listItem = document.createElement('li');
+      listItem.textContent = team.name;
+      listItem.style.padding = '8px';
+      listItem.style.cursor = 'pointer';
+  
+      listItem.addEventListener('click', () => {
+        // Redirigir a equipo.html con parámetro id
+        window.location.href = `equipo.html?id=${encodeURIComponent(team.id)}`;
+      });
+  
+      list.appendChild(listItem);
+    });
+  
+    searchResultsContainer.appendChild(list);
+    searchResultsContainer.style.display = 'block';
+  }
+  
+
+</script>
+
+
+    
+
+</body>
+</html>

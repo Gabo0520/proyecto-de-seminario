@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Partidos en Vivo</title>
+  <style>
+    /* Estilos generales - Tema oscuro */
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #121212;
+      color: #e0e0e0;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    
+    h1, h2, h3 {
+      color: #ffffff;
+      text-align: center;
+    }
+    
+    h1 {
+      margin-top: 30px;
+      margin-bottom: 30px;
+      font-size: 2.5em;
+      text-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
+    }
+    
+    /* Contenedor de partidos */
+    #matches-container {
+      margin-top: 30px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+    }
+    
+    /* Tarjetas de partidos */
+    .match-card {
+      border: 1px solid #333;
+      padding: 20px;
+      margin-bottom: 15px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+      position: relative;
+      background-color: #1e1e1e;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .match-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+    }
+    
+    .teams {
+      font-weight: bold;
+      font-size: 1.3em;
+      text-align: center;
+      margin-bottom: 15px;
+      color: #ffffff;
+    }
+    
+    .score {
+      font-size: 2em;
+      margin: 15px 0;
+      text-align: center;
+      font-weight: bold;
+      color: #ffffff;
+    }
+    
+    .status {
+      color: #4caf50;
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    
+    .competition {
+      text-align: center;
+      color: #bbbbbb;
+      font-style: italic;
+      margin-bottom: 20px;
+    }
+    
+    .no-matches {
+      text-align: center;
+      font-style: italic;
+      color: #aaa;
+      margin-top: 40px;
+      grid-column: 1 / -1;
+      font-size: 1.2em;
+    }
+    
+    /* Botón de estadísticas */
+    button.stats-btn {
+      padding: 10px 15px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 1em;
+      display: block;
+      margin: 0 auto;
+      transition: background-color 0.3s;
+      width: 100%;
+    }
+    
+    button.stats-btn:hover {
+      background-color: #0056b3;
+    }
+
+    /* Modal Styles */
+    #stats-modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.8);
+    }
+    
+    #stats-modal-content {
+      background-color: #1e1e1e;
+      margin: 5% auto;
+      padding: 25px;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 700px;
+      max-height: 80vh;
+      overflow-y: auto;
+      box-shadow: 0 5px 25px rgba(0,0,0,0.5);
+      position: relative;
+      color: #e0e0e0;
+      border: 1px solid #333;
+    }
+    
+    #stats-modal h2 {
+      margin-top: 0;
+      color: #007bff;
+      border-bottom: 1px solid #333;
+      padding-bottom: 10px;
+    }
+    
+    #stats-modal h3 {
+      color: #007bff;
+      margin-top: 25px;
+      text-align: left;
+    }
+    
+    #close-modal {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      font-size: 1.8em;
+      color: #aaa;
+      cursor: pointer;
+      transition: color 0.3s;
+    }
+    
+    #close-modal:hover {
+      color: #fff;
+    }
+    
+    .stat-item {
+      margin-bottom: 12px;
+      padding: 8px;
+      border-radius: 6px;
+      background-color: #252525;
+    }
+    
+    .stat-item:hover {
+      background-color: #2c2c2c;
+    }
+    
+    .stat-item strong {
+      display: inline-block;
+      width: 180px;
+      color: #bbbbbb;
+    }
+    
+    /* Estilos para alineaciones */
+    ul {
+      padding-left: 20px;
+    }
+    
+    li {
+      margin-bottom: 5px;
+    }
+    
+    /* Loader */
+    .loader {
+      text-align: center;
+      margin: 20px auto;
+      font-size: 1.2em;
+      color: #007bff;
+    }
+  </style>
+</head>
+<body>
+  <h1>⚽ Partidos en Vivo ⚽</h1>
+  <div id="matches-container">
+    <p class="loader">Cargando partidos en vivo...</p>
+  </div>
+
+  <h2>Próximos Partidos</h2>
+<div id="next-matches-container">
+  <p class="loader">Cargando próximos partidos...</p>
+</div>
+
+
+  <!-- Modal para mostrar estadísticas -->
+  <div id="stats-modal">
+    <div id="stats-modal-content">
+      <span id="close-modal">&times;</span>
+      <h2>Estadísticas del Partido</h2>
+      <div id="stats-content">
+        <p class="loader">Cargando estadísticas...</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const container = document.getElementById('matches-container');
+    const modal = document.getElementById('stats-modal');
+    const modalContent = document.getElementById('stats-content');
+    const closeModalBtn = document.getElementById('close-modal');
+
+    // Función para crear tarjeta de partido con botón
+    function createMatchCard(match) {
+      const homeTeam = match.teams.home.name;
+      const awayTeam = match.teams.away.name;
+      const homeScore = match.goals.home !== null ? match.goals.home : '-';
+      const awayScore = match.goals.away !== null ? match.goals.away : '-';
+      const status = match.fixture.status.long;
+      const competition = match.league.name;
+      const fixtureId = match.fixture.id;
+
+      const div = document.createElement('div');
+      div.className = 'match-card';
+
+      div.innerHTML = `
+        <div class="teams">${homeTeam} vs ${awayTeam}</div>
+        <div class="score">${homeScore} - ${awayScore}</div>
+        <div class="status">Estado: ${status}</div>
+        <div class="competition">${competition}</div>
+        <button class="stats-btn">Ver detalles del partido</button>
+      `;
+
+      // Evento para abrir modal y cargar estadísticas
+      const btn = div.querySelector('.stats-btn');
+      btn.addEventListener('click', () => {
+        openStatsModal(fixtureId, `${homeTeam} vs ${awayTeam}`);
+      });
+
+      return div;
+    }
+
+    function createNextMatchCard(match) {
+  const homeTeam = match.teams.home.name;
+  const awayTeam = match.teams.away.name;
+  const homeScore = match.goals.home !== null ? match.goals.home : '-';
+  const awayScore = match.goals.away !== null ? match.goals.away : '-';
+  const status = match.fixture.status.long;
+  const competition = match.league.name;
+
+  const div = document.createElement('div');
+  div.className = 'match-card';
+
+  div.innerHTML = `
+    <div class="teams">${homeTeam} vs ${awayTeam}</div>
+    <div class="score">${homeScore} - ${awayScore}</div>
+    <div class="status">Estado: ${status}</div>
+    <div class="competition">${competition}</div>
+  `;
+  return div;
+}
+
+const nextMatchesContainer = document.getElementById('next-matches-container');
+
+async function fetchNextMatches() {
+  nextMatchesContainer.innerHTML = '<p class="loader">Cargando próximos partidos...</p>';
+  try {
+    const response = await fetch('http://localhost:3000/api/fixtures/next/10');
+    if (!response.ok) throw new Error(`Error ${response.status}: ${response.statusText}`);
+
+    const data = await response.json();
+
+    if (!data.fixtures || data.fixtures.length === 0) {
+      nextMatchesContainer.innerHTML = '<p class="no-matches">No hay próximos partidos programados.</p>';
+      return;
+    }
+
+    nextMatchesContainer.innerHTML = '';
+    data.fixtures.forEach(match => {
+      nextMatchesContainer.appendChild(createNextMatchCard(match));
+    });
+  } catch (error) {
+    nextMatchesContainer.innerHTML = `<p class="no-matches">Error al cargar próximos partidos: ${error.message}</p>`;
+  }
+}
+
+
+
+    // Función para abrir modal y cargar estadísticas
+    async function openStatsModal(fixtureId, matchTitle) {
+      modal.style.display = 'block';
+      modalContent.innerHTML = '<p class="loader">Cargando datos del partido...</p>';
+      document.querySelector('#stats-modal h2').textContent = `Datos: ${matchTitle}`;
+
+      try {
+        // Peticiones paralelas para estadísticas, eventos y alineaciones
+        const [statsRes, eventsRes, lineupsRes] = await Promise.all([
+          fetch(`http://localhost:3000/api/matches/${fixtureId}/statistics`),
+          fetch(`http://localhost:3000/api/matches/${fixtureId}/events`),
+          fetch(`http://localhost:3000/api/matches/${fixtureId}/lineups`)
+        ]);
+
+        if (!statsRes.ok) throw new Error(`Error estadísticas: ${statsRes.statusText}`);
+        if (!eventsRes.ok) throw new Error(`Error eventos: ${eventsRes.statusText}`);
+        if (!lineupsRes.ok) throw new Error(`Error alineaciones: ${lineupsRes.statusText}`);
+
+        const statsData = await statsRes.json();
+        const eventsData = await eventsRes.json();
+        const lineupsData = await lineupsRes.json();
+
+        // Procesar estadísticas
+        let html = '<h3>📊 Estadísticas</h3>';
+        if (statsData.response && statsData.response.length > 0) {
+          const stats = statsData.response[0].statistics;
+          if (stats && stats.length > 0) {
+            stats.forEach(stat => {
+              html += `<div class="stat-item"><strong>${stat.type}:</strong> ${stat.home ?? 0} - ${stat.away ?? 0}</div>`;
+            });
+          } else {
+            html += '<p>No hay estadísticas disponibles.</p>';
+          }
+        } else {
+          html += '<p>No hay estadísticas disponibles.</p>';
+        }
+
+        // Procesar eventos
+        html += '<h3>⚽ Eventos</h3>';
+        if (eventsData.response && eventsData.response.length > 0) {
+          eventsData.response.forEach(event => {
+            let emoji = '📝';
+            if (event.type === 'Goal') emoji = '⚽';
+            if (event.type === 'Card') emoji = event.detail.includes('Yellow') ? '🟨' : '🟥';
+            if (event.type === 'subst') emoji = '🔄';
+            
+            html += `
+              <div class="stat-item">
+                <strong>${event.time.elapsed}' - ${event.team.name}:</strong> ${emoji} ${event.player.name} (${event.detail})
+              </div>`;
+          });
+        } else {
+          html += '<p>No hay eventos disponibles.</p>';
+        }
+
+        // Procesar alineaciones
+        html += '<h3>👥 Alineaciones</h3>';
+        if (lineupsData.response && lineupsData.response.length > 0) {
+          lineupsData.response.forEach(team => {
+            html += `<strong>${team.team.name}</strong><br/>`;
+            html += `<em>Formación:</em> ${team.formation}<br/>`;
+            html += `<em>Jugadores:</em><br/><ul>`;
+            team.startXI.forEach(player => {
+              html += `<li>${player.player.number} - ${player.player.name} (${player.player.pos})</li>`;
+            });
+            html += '</ul><br/>';
+          });
+        } else {
+          html += '<p>No hay alineaciones disponibles.</p>';
+        }
+
+        modalContent.innerHTML = html;
+
+      } catch (error) {
+        modalContent.innerHTML = `<p>Error al cargar datos: ${error.message}</p>`;
+      }
+    }
+
+    // Cerrar modal
+    closeModalBtn.onclick = () => {
+      modal.style.display = 'none';
+    };
+
+    // Cerrar modal al hacer clic fuera del contenido
+    window.onclick = (event) => {
+      if (event.target === modal) {
+        modal.style.display = 'none';
+      }
+    };
+
+    async function fetchLiveMatches() {
+      container.innerHTML = '<p class="loader">Cargando partidos en vivo...</p>';
+      try {
+        const response = await fetch('http://localhost:3000/api/matches/live');
+        if (!response.ok) throw new Error(`Error ${response.status}: ${response.statusText}`);
+
+        const data = await response.json();
+
+        if (!data.response || data.response.length === 0) {
+          container.innerHTML = '<p class="no-matches">No hay partidos en vivo en este momento.</p>';
+          return;
+        }
+
+        container.innerHTML = ''; // Limpiar contenido
+
+        data.response.forEach(match => {
+          container.appendChild(createMatchCard(match));
+        });
+      } catch (error) {
+        container.innerHTML = `<p class="no-matches">Error al cargar partidos: ${error.message}</p>`;
+      }
+    }
+
+    // Carga inicial
+    fetchLiveMatches();
+    fetchNextMatches();
+
+
+    // Actualiza cada 2 minutos
+    setInterval(fetchLiveMatches, 120000);
+  </script>
+</body>
+</html>

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Detalles del Equipo</title>
+  <style>
+    body {
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      color: #e0e0e0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 600px;
+      margin: 40px auto;
+      background: rgba(30,30,30,0.95);
+      border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+      padding: 32px 24px;
+    }
+    h1 {
+      text-align: center;
+      color: #1e90ff;
+      margin-bottom: 12px;
+    }
+    .crest {
+      display: block;
+      margin: 0 auto 18px auto;
+      width: 100px;
+      height: 100px;
+      object-fit: contain;
+      background: #fff;
+      border-radius: 50%;
+      box-shadow: 0 0 12px #1e90ffaa;
+    }
+    .info-list {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 18px 0;
+    }
+    .info-list li {
+      margin-bottom: 10px;
+      font-size: 1.1em;
+      background: #222d3b;
+      padding: 10px 16px;
+      border-radius: 8px;
+    }
+    .info-list strong {
+      color: #1e90ff;
+      width: 120px;
+      display: inline-block;
+    }
+    .players-title {
+      margin-top: 30px;
+      color: #63b3ed;
+      text-align: center;
+      font-size: 1.3em;
+    }
+    .players-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .players-list li {
+      background: #273549;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 0.98em;
+    }
+    .loader, .error {
+      text-align: center;
+      margin: 30px 0 0 0;
+      font-size: 1.1em;
+    }
+    .error {
+      color: #ff6b6b;
+    }
+    @media (max-width: 600px) {
+      .container { padding: 16px 5px; }
+      .players-list { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 id="team-name">Equipo</h1>
+    <img id="team-crest" class="crest" src="" alt="Escudo del equipo" style="display:none;">
+    <ul class="info-list" id="team-info"></ul>
+    <div class="players-title">Plantilla</div>
+    <ul class="players-list" id="players-list"></ul>
+    <div class="loader" id="loader">Cargando datos del equipo...</div>
+    <div class="error" id="error-message"></div>
+  </div>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const teamId = urlParams.get('id');
+    const apiKey = 'TU_API_KEY'; // Reemplaza con tu clave de football-data.org
+
+    const loader = document.getElementById('loader');
+    const errorMessage = document.getElementById('error-message');
+    const teamName = document.getElementById('team-name');
+    const teamCrest = document.getElementById('team-crest');
+    const teamInfo = document.getElementById('team-info');
+    const playersList = document.getElementById('players-list');
+
+    if (!teamId) {
+      loader.style.display = 'none';
+      errorMessage.textContent = 'No se proporcionó un ID de equipo válido en la URL.';
+    } else {
+      fetchTeamDetails(teamId);
+    }
+
+    async function fetchTeamDetails(id) {
+        loader.style.display = 'block';
+        errorMessage.textContent = '';
+        teamInfo.innerHTML = '';
+        playersList.innerHTML = '';
+        teamCrest.style.display = 'none';
+      
+        try {
+          // Petición a tu backend local que hace proxy a football-data.org
+          const teamRes = await fetch(`http://localhost:3000/api/equipo/${id}`);
+          if (!teamRes.ok) throw new Error('No se pudo obtener la información del equipo.');
+          const teamData = await teamRes.json();
+      
+          // Mostrar datos generales
+          teamName.textContent = teamData.name || 'Equipo';
+          if (teamData.crest) {
+            teamCrest.src = teamData.crest;
+            teamCrest.style.display = 'block';
+          }
+          teamInfo.innerHTML = `
+            <li><strong>Fundado:</strong> ${teamData.founded || 'N/D'}</li>
+            <li><strong>País:</strong> ${teamData.area?.name || 'N/D'}</li>
+            <li><strong>Estadio:</strong> ${teamData.venue || 'N/D'}</li>
+            <li><strong>Dirección:</strong> ${teamData.address || 'N/D'}</li>
+            <li><strong>Teléfono:</strong> ${teamData.phone || 'N/D'}</li>
+            <li><strong>Web:</strong> ${teamData.website ? `<a href="${teamData.website}" target="_blank" style="color:#63b3ed;">${teamData.website}</a>` : 'N/D'}</li>
+          `;
+      
+          // Plantilla (squad)
+          if (teamData.squad && teamData.squad.length > 0) {
+            playersList.innerHTML = '';
+            teamData.squad.forEach(player => {
+              const li = document.createElement('li');
+              li.textContent = `${player.name} (${player.position || 'Sin posición'})`;
+              playersList.appendChild(li);
+            });
+          } else {
+            playersList.innerHTML = '<li>No hay información de plantilla disponible.</li>';
+          }
+      
+          loader.style.display = 'none';
+        } catch (error) {
+          loader.style.display = 'none';
+          errorMessage.textContent = error.message;
+        }
+      }
+      
+  </script>
+</body>
+</html>
