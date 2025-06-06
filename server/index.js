@@ -10,11 +10,12 @@ const port = 3000;
 
 // Configura aquí tus datos de conexión MySQL
 const dbConfig = {
-  host: 'localhost',
-  user: 'root',
-  password: '1234',
-  database: 'proyecto_de_seminario'
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME
 };
+
 
 app.use(cors());
 app.use(bodyParser.json());
